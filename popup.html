@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Material+Icons');
+
+    body {
+      width: 600px;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+    }
+    h3 {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 5px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+      padding: 5px 0;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    .icon {
+      vertical-align: middle;
+      margin-right: 5px;
+      font-size: 18px;
+    }
+    .radio-group {
+      margin-top: 10px;
+    }
+    .radio-group label {
+      display: block;
+      margin: 5px 0;
+    }
+    .results {
+      font-size: 1.1em;
+      margin-top: 15px;
+    }
+    #left, #middle, #right {
+      width: 31%;
+    }
+    .flex-container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .page-link {
+      font-family: monospace;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    #criteriaResults {
+        font-size: large;
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>NUSAG: Progress Tracking</h1>
+  <p class="page-link" id="pageLink"></p>
+
+  <div class="flex-container">
+    <div id="left">
+      <h3><span class="material-icons icon">search</span>1. Search Term / Regex Match</h3>
+      <label for="regex">Enter Regex:</label>
+      <input type="text" id="regex" placeholder="Regex"/>
+      <label for="flags">Regex Flags:</label>
+      <input type="text" id="flags" placeholder="Flags (e.g., gi)"/>
+      <button id="applyRegex">Apply Regex</button>
+      <div id="regexResults" class="results"></div>
+    </div>
+
+    <div id="middle">
+      <h3><span class="material-icons icon">check_circle</span>2. Determine True or False?</h3>
+      <div class="radio-group" id="matchTypeGroup">
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="exists" id="exists" checked>
+          Exists
+          <span class="tooltiptext">Check if the regex match exists in the text</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="size" id="size">
+          Count Above
+          <span class="tooltiptext">Check the number of matches</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="contains" id="contains">
+          Contains
+          <span class="tooltiptext">Check if the text contains the regex match</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="equals" id="equals" disabled>
+          Equals (if Number)
+          <span class="tooltiptext">Check if the match equals a specific number</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="largerThan" id="largerThan" disabled>
+          Larger Than (if Number)
+          <span class="tooltiptext">Check if the match is larger than a specific number</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="smallerThan" id="smallerThan" disabled>
+          Smaller Than (if Number)
+          <span class="tooltiptext">Check if the match is smaller than a specific number</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="largerEqThan" id="largerEqThan" disabled>
+          Larger Equals Than (if Num)
+          <span class="tooltiptext">Check if the match is larger or equal to a specific number</span>
+        </label>
+        <label class="tooltip">
+          <input type="radio" name="matchType" value="smallerEqThan" id="smallerEqThan" disabled>
+          Smaller Equals Than (if Num)
+          <span class="tooltiptext">Check if the match is smaller or equal to a specific number</span>
+        </label>
+      </div>
+      <label for="value">Value (if applicable):</label>
+      <input type="text" id="value" placeholder="Value"/>
+      <button id="applyCriteria" disabled>Apply Criteria</button>
+      <div id="criteriaResults" class="results"></div>
+    </div>
+
+    <div id="right">
+        <h3><span class="material-icons icon">check_circle</span>3. Confirm Tracking Setup</h3>
+        <label for="flags">Did you get the intended output? It will be used to grade your Adventurers.</label>
+        <p class="page-link" id="preview" style="white-space: pre-line;">Preview will be shown here.</p>
+        <button id="confirmRegex" disabled>Confirm</button>
+      </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

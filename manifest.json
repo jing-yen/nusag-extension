@@ -1,0 +1,26 @@
+{
+  "manifest_version": 2,
+  "name": "Progress Extractor",
+  "version": "1.0",
+  "description": "Extracts progress element from webpage.",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  }
+}

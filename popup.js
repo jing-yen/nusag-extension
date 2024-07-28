@@ -1,7 +1,10 @@
 // popup.js
+
+let criteriaData = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Load the last used criteria
-    chrome.storage.local.get(['criteria', 'regex'], (result) => {
+    /*chrome.storage.local.get(['criteria', 'regex'], (result) => {
       if (result.regex) {
         document.getElementById('regex').value = result.regex.pattern;
         document.getElementById('flags').value = result.regex.flags;
@@ -13,6 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(function() {
           applyCriteria();
         }, 500);
+      }
+    });*/
+
+
+    chrome.runtime.sendMessage({ action: 'getCriteria' }, (data) => {
+      console.log(data);
+      if (data.action) {
+        document.getElementById('default').style.display = 'none';
+        if (data.action==='openAndCollectData') {
+          document.getElementById('track').style.display = 'none';
+        } else if (data.action==='startTracking') {
+          document.getElementById('left-setup').style.display = 'none';
+          document.getElementById('middle-setup').style.display = 'none';
+          document.getElementById('right-setup').style.display = 'none';
+        }
+
+        criteriaData = data.criteriaData;
+
+        // Populate the popup UI with the criteria data
+        document.getElementById('regex').value = data.criteriaData.regex;
+        document.getElementById('flags').value = data.criteriaData.flags;
+        document.getElementById(data.criteriaData.matchType).checked = true;
+        document.getElementById('value').value = data.criteriaData.value;
+        // Do other stuff as needed
+        applyRegex();
+        setTimeout(function() {
+          applyCriteria();
+        }, 200);
+      } else {
+        document.getElementById('left-setup').style.display = 'none';
+        document.getElementById('middle-setup').style.display = 'none';
+        document.getElementById('right-setup').style.display = 'none';
+        document.getElementById('track').style.display = 'none';
       }
     });
 
@@ -35,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('applyRegex').addEventListener('click', applyRegex);
     document.getElementById('applyCriteria').addEventListener('click', applyCriteria);
     document.getElementById('confirmRegex').addEventListener('click', confirmCriteria);
+    document.getElementById('evaluate').addEventListener('click', evaluate);
   
     function applyRegex() {
       const regex = document.getElementById('regex').value;
@@ -82,12 +119,38 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    function evaluate() {
+      applyRegex();
+      setTimeout(function() {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.sendMessage(tabs[0].id, { action: 'filterByRegex', criteria: criteriaData }, (response) => {
+            const trackTextBox = document.getElementById('track-text');
+            trackTextBox.innerHTML = response.matchedElements ? 'Congratulations, you finished the goal!\n\nYou can go back to NUSAG.': 'You have not finished the goal yet.';
+            if (response.matchedElements) {
+              trackTextBox.style.color = 'green';
+              document.getElementById('evaluate').display = 'none';
+              chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                chrome.runtime.sendMessage({
+                  action: 'announceComplete',
+                  data: "empty data"
+                });
+              });
+            }
+          });
+        });
+      }, 200);
+    }
+
     function confirmCriteria() {
         const regex = document.getElementById('regex').value;
         const matchType = document.querySelector('input[name="matchType"]:checked').value;
         const value = document.getElementById('value').value;
         const flags = document.getElementById('flags').value;
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            chrome.runtime.sendMessage({
+              action: 'sendCriteria',
+              data: {regex, matchType, value, flags}
+            });
             showAlert(tabs[0].url, regex, flags, matchType, value);
           });
     }
@@ -122,20 +185,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function displayCriteriaResults(resultBool) {
       const criteriaResultsDiv = document.getElementById('criteriaResults');
       criteriaResultsDiv.innerHTML = resultBool ? '<hr/><p>True</p>': '<hr/><p>False</p>';
-      if (elements.length > 0) {
-        criteriaResultsDiv.innerHTML = `<p>Matched Elements:</p><ul>${elements.map(el => `<li>${el}</li>`).join('')}</ul>`;
-      } else {
-        criteriaResultsDiv.innerHTML = '<p>No matches found</p>';
-      }
     }
 
     function showAlert(currentPage, regex, flags, matchType, value) {
-        alert(`Parameters:
+        /*alert(`Parameters:
         Link: ${currentPage}
         Regex: ${regex}
         Flags: ${flags}
         Mode: ${matchType}
-        Value: ${value}`);
+        Value: ${value}`);*/
+        alert('Criteria recorded. You can head back to NUSAG now.');
       }
   });
   

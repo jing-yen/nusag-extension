@@ -105,7 +105,19 @@
   <p class="page-link" id="pageLink"></p>
 
   <div class="flex-container">
-    <div id="left">
+    <div id="default">
+      <h2>Welcome! The extension is currently sleeping. Zzz.</h2>
+      <h3>To use this extension:</h3>
+      <h3>As a user, click on a training question on NUSAG.</h3>
+      <h3>As an admin, set up progress tracking for a question.</h3>
+    </div>
+
+    <div id="track">
+      <h2 id="track-text" style="white-space: pre-line;">You have not finished the goal yet.</h2>
+      <button id="evaluate">Evaluate Again</button>
+    </div>
+
+    <div id="left-setup">
       <h3><span class="material-icons icon">search</span>1. Search Term / Regex Match</h3>
       <label for="regex">Enter Regex:</label>
       <input type="text" id="regex" placeholder="Regex"/>
@@ -115,7 +127,7 @@
       <div id="regexResults" class="results"></div>
     </div>
 
-    <div id="middle">
+    <div id="middle-setup">
       <h3><span class="material-icons icon">check_circle</span>2. Determine True or False?</h3>
       <div class="radio-group" id="matchTypeGroup">
         <label class="tooltip">
@@ -165,7 +177,7 @@
       <div id="criteriaResults" class="results"></div>
     </div>
 
-    <div id="right">
+    <div id="right-setup">
         <h3><span class="material-icons icon">check_circle</span>3. Confirm Tracking Setup</h3>
         <label for="flags">Did you get the intended output? It will be used to grade your Adventurers.</label>
         <p class="page-link" id="preview" style="white-space: pre-line;">Preview will be shown here.</p>

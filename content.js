@@ -74,6 +74,53 @@ function analyzePage() {
 
       searchResult = matches;
       sendResponse(matches);
+    } else if (request.action === 'applyCriteria') {
+      const elements = document.querySelectorAll('*');
+      const matches = [];
+  
+      elements.forEach(element => {
+        const text = element.childNodes[0]?.nodeValue;
+        if (text && evaluateMatch(text, request.criteria)) {
+          matches.push(element);
+        }
+      });
+  
+      sendResponse(matches);
     }
   });
   
+  // Listen for messages from the webpage
+  window.addEventListener("message", function(event) {
+    // We only accept messages from this window
+    if (event.source != window) return;
+
+    if (event.data.type && event.data.type === "FROM_PAGE") {
+      if (event.data.action === 'checkExtensionIsInstalled') {
+        window.postMessage({ type: "FROM_EXTENSION", action: 'extensionIsInstalled' }, "*");
+      } else {
+        chrome.runtime.sendMessage(event.data, (response) => {});
+      }
+    }
+  }, false);
+
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log(message);
+    if (message.action === 'sendCriteria') {
+      criteriaData = message.data;
+      
+      // Send to the popup if it's open
+      window.postMessage({
+        type: "FROM_EXTENSION",
+        action: 'dataCollected',
+        data: criteriaData
+      });
+  
+      sendResponse({ status: 'criteria received' });
+    } else if (message.action === 'announceComplete') {
+      window.postMessage({
+        type: "FROM_EXTENSION",
+        action: 'announceComplete',
+        data: message.data
+      });
+    }
+  });
